@@ -20,9 +20,12 @@ body {
   height: calc(100vh - 48px);
   position: relative;
 }
-.location-icon{
-  font-size: 2rem;
-  color: red;
+.fire-marker{
+  background: #ff4500;
+  border: 1px solid #b22222;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
 }
 
 .location-info{

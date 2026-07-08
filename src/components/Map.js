@@ -1,40 +1,50 @@
 import { useState } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 import 'leaflet/dist/leaflet.css'
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.css'
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css'
 import LocationMarker from './LocationMarker'
 import LocationInfoBox from './LocationInfoBox'
 
-const Map = ({ eventData, center = [42.265, -122.875], zoom = 6 }) => {
+const Map = ({ eventData, center = [20, 0], zoom = 3 }) => {
   const [locationInfo, setLocationInfo] = useState(null)
 
-  const wildfires = eventData ? eventData.filter(ev => ev.categories.some(c => c.id === 8)) : []
-
-  const markers = wildfires.map(ev => {
-    if(ev.geometries.length > 0) {
-      const [longitude, latitude] = ev.geometries[0].coordinates
-      return (
-        <LocationMarker
-          key={ev.id}
-          position={[latitude, longitude]}
-          onClick={() => setLocationInfo({ id: ev.id, title: ev.title, latitude, longitude })}
-        />
-      )
-    }
-    return null
-  })
+  const markers = eventData ? eventData.map((ev, i) => {
+    const latitude = parseFloat(ev.latitude)
+    const longitude = parseFloat(ev.longitude)
+    return (
+      <LocationMarker
+        key={i}
+        position={[latitude, longitude]}
+        onClick={() => setLocationInfo({
+          latitude,
+          longitude,
+          date: ev.acq_date,
+          time: ev.acq_time,
+          confidence: ev.confidence,
+          satellite: ev.satellite,
+          frp: ev.frp,
+        })}
+      />
+    )
+  }) : []
 
   return (
     <div className='map'>
-      <MapContainer 
+      <MapContainer
         center={center}
         zoom={zoom}
         style={{ width: '100%', height: '100%' }}
+        preferCanvas={true}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        {markers}
+        <MarkerClusterGroup chunkedLoading maxClusterRadius={60}>
+          {markers}
+        </MarkerClusterGroup>
       </MapContainer>
       {locationInfo !== null && <LocationInfoBox info={locationInfo} />}
     </div>

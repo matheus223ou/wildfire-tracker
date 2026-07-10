@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
 import MarkerClusterGroup from 'react-leaflet-cluster'
 import 'leaflet/dist/leaflet.css'
@@ -10,7 +10,7 @@ import LocationInfoBox from './LocationInfoBox'
 const Map = ({ eventData, center = [20, 0], zoom = 3 }) => {
   const [locationInfo, setLocationInfo] = useState(null)
 
-  const markers = eventData ? eventData.map((ev, i) => {
+  const markers = useMemo(() => eventData ? eventData.map((ev, i) => {
     const latitude = parseFloat(ev.latitude)
     const longitude = parseFloat(ev.longitude)
     return (
@@ -28,7 +28,7 @@ const Map = ({ eventData, center = [20, 0], zoom = 3 }) => {
         })}
       />
     )
-  }) : []
+  }) : [], [eventData])
 
   return (
     <div className='map'>
